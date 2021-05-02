@@ -9,6 +9,8 @@ import {
     StyleSheet
 } from 'react-native'
 import { CommonActions } from '@react-navigation/native'
+import { connect } from 'react-redux'
+import { addCard } from '../actions/decks'
 
 class AddCard extends Component {
     state = {
@@ -16,49 +18,72 @@ class AddCard extends Component {
         answer: ''
     }
 
-    onChange = (e) => {
-        const type = e.target.id
-        const value = e.target.value
-
+    onChangeQuestion = (text) => {
+        console.log(text)
         this.setState(() => ({
-            [type]: value
+            question: text
         }))
     }
 
+    onChangeAnswer = (text) => {
+        this.setState(() => ({
+            answer: text
+        }))
+    }
     onSubmit = () => {
-        addCardToDeck(this.props.title, this.state.question, this.state.answer)
-        .then(() => this.goBack())
+        const { question, answer } = this.state
+        console.log(question, answer)
+        addCardToDeck(this.props.title, question, answer)
+        .then(() => {
+            this.props.addCard({ question, answer })
+            this.setState(() => ({
+                question: '',
+                answer: ''
+            }))
+            this.props.navigation.navigate('Deck', {title: this.props.title})
+        })
+        
+        
     }
 
-    goBack = () => {
-        this.props.navigation.CommonActions.goBack()
-    }
+   
 
     render() {
         const { question, answer } = this.state
         return (
             <View>
                 <Text>New Question:</Text>
-                <TextInput 
-                    multiline
-                    numberOfLines={2}
-                    id='question'
-                    onChange={this.onChange}
-                    value={question}
+                <TextInput
+                    onChangeText={this.onChangeQuestion}
                     placeholder='Please input the new question'
                 />
                 <Text>New Answer:</Text>
                 <TextInput 
                     multiline
                     numberOfLines={4}
-                    id='answer'
-                    onChange={this.onChange}
-                    value={answer}
+                    onChangeText={this.onChangeAnswer}
                     placeholder='Please input the new answer'
                 />
-                <TouchableOpacity disabled={question === '' || answer === ''} onPress={this.onSubmit}>Submit</TouchableOpacity>
-                <TouchableOpacity onPress={this.goBack()}>Go Back</TouchableOpacity>
+                <TouchableOpacity disabled={question === '' || answer === ''} onPress={this.onSubmit}>
+                    <Text>Submit</Text>
+                </TouchableOpacity>
             </View>
         )
     }
 }
+
+function mapStateToProps (decks, {route} ) {
+    const { title } = route.params
+    return {
+        decks,
+        title
+    }
+}
+
+function mapDispatchToProps () {
+    return {
+        addCard
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(AddCard)
