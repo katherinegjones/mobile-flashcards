@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { saveDeckTitle } from '../utils/api'
+import { addDeck } from '../actions/decks'
 import {
     View,
     Text,
@@ -9,25 +10,38 @@ import {
     StyleSheet
 } from 'react-native'
 import { CommonActions } from '@react-navigation/native'
+import { connect } from 'react-redux'
 
-class AddDecks extends Component {
+class AddDeck extends Component {
     state = {
         title: ''
     }
 
-    onChange = (e) => {
-        const title = e.target.value
+   
+    onChange = (text) => {
         this.setState(() => ({
-            title
+            title: text
         }))
     }
     toHome = () => {
-        this.props.navigate.CommonActions.goBack()
+        this.props.navigation.dispatch(CommonActions.goBack())
     }
 
     handleSubmit = () => {
-        saveDeckTitle(this.state.title)
-        .then(() => this.toHome())
+        const { title } = this.state
+        saveDeckTitle(title)
+        
+            .then(() => {
+                this.props.addDeck({
+                    [title]: {
+                        questions: []
+                    }})
+                this.setState(() => ({ title: ''}))
+                this.toHome()
+                
+        
+            })
+        
     }
     render() {
         const { title } = this.state
@@ -35,13 +49,25 @@ class AddDecks extends Component {
             <View>
                 <Text>What is the title of your new quiz?</Text>
                 <TextInput
-                    onChange={this.onChange}
+                    onChangeText={this.onChange}
                     placeholder='Please enter your new title'
-                    value={title}
                 />
-                <TouchableOpacity disabled={title===''} onPress={this.handleSubmit}>Submit</TouchableOpacity>
-                <TouchableOpacity onPress={this.toHome}>Back to Main</TouchableOpacity>
+                <TouchableOpacity disabled={title===''} onPress={this.handleSubmit}>
+                    <Text>Submit</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={this.toHome}>
+                    <Text>Back to Main</Text>
+                </TouchableOpacity>
             </View>
         )
     }
 }
+
+const mapDispatchToProps = () => {
+    return{
+        addDeck
+        }
+    }
+
+
+export default connect(mapDispatchToProps)(AddDeck)
