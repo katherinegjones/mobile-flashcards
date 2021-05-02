@@ -1,3 +1,4 @@
+import { CommonActions } from '@react-navigation/routers'
 import React, { Component } from 'react'
 import { 
     View,
@@ -7,34 +8,56 @@ import {
     StyleSheet
 } from 'react-native'
 import { connect } from 'react-redux'
-import { shuffleDeck } from '../utils/helpers'
 
 class Deck extends Component {
     render(){
-        const { decks, title } = this.props
-        const deck = decks[title]
+        const { deck, title } = this.props
         const questions = deck.questions
-        const shuffled = shuffleDeck(questions)
         return(
-            <View>
-                <Text>{title}</Text>
-                <Text># of cards: {questions.length}</Text>
-                <TouchableOpacity onPress={this.props.navigation.navigate('Deck', {deck: shuffled})}>
-                    Start Quiz
+            <View style={styles.container}>
+                <Text style={{fontSize: 35, paddingBottom: 10}}>{title}</Text>
+                <Text style={{fontSize: 20}}># of cards: {questions.length}</Text>
+                {questions.length > 0 && (
+                <TouchableOpacity 
+                    onPress={() => this.props.navigation.navigate('CardContainer', {deckTitle: title})}
+                    style={styles.button}
+                    >
+                    <Text>Start Quiz</Text>                    
                 </TouchableOpacity>
-                <TouchableOpacity onPress={this.props.navigation.navigate('AddCard', {title: title})}>
-                    Add Card
-                </TouchableOpacity>
-                <TouchableOpacity onPress={this.props.navigation.navigate('DeckList')}>
-                    Back to Home
+                )}
+                
+                <TouchableOpacity 
+                    onPress={() => this.props.navigation.navigate('AddCard', {title: title})}
+                    style={styles.button}
+                    >
+                    <Text>Add Card</Text>
                 </TouchableOpacity>
             </View>
         )
     }
 } 
 
-function mapStateToProps( decks ) {
+function mapStateToProps( state, { route } ) {
+    const { title } = route.params
     return {
-        decks
+        title,
+        deck: state[title]
     }
 }
+
+const styles = StyleSheet.create({
+    'container': {
+        flex: 1,
+        flexDirection: 'column',
+        alignItems: 'center'
+    },
+    'button': {
+        margin: 10,
+        padding: 5,
+        borderWidth: 1,
+        borderColor: '#000',
+        borderRadius: 5
+    }
+})
+
+export default connect(mapStateToProps)(Deck)
