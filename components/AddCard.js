@@ -11,6 +11,7 @@ import {
 import { CommonActions } from '@react-navigation/native'
 import { connect } from 'react-redux'
 import { addCard } from '../actions/decks'
+import universal from './Styles'
 
 class AddCard extends Component {
     state = {
@@ -30,19 +31,16 @@ class AddCard extends Component {
             answer: text
         }))
     }
-    onSubmit = () => {
+    onSubmit = async () => {
         const { question, answer } = this.state
-        console.log(question, answer)
-        addCardToDeck(this.props.title, question, answer)
-        .then(() => {
-            this.props.addCard({ question, answer })
-            this.setState(() => ({
+        const { route, navigation, addCard } = this.props
+        const { title } = route.params
+        addCard({ question, answer })
+        await addCardToDeck(title, question, answer)
+        this.setState(() => ({
                 question: '',
                 answer: ''
-            }))
-            this.props.navigation.navigate('Deck', {title: this.props.title})
-        })
-        
+            }))     
         
     }
 
@@ -50,35 +48,37 @@ class AddCard extends Component {
 
     render() {
         const { question, answer } = this.state
+        const { navigation, route } = this.props
         return (
-            <View>
-                <Text>New Question:</Text>
+            <View style={universal.container}>
+                <Text style={styles.label}>New Question:</Text>
                 <TextInput
+                    multiline
+                    numberOfLines={4}
+                    style={universal.input}
                     onChangeText={this.onChangeQuestion}
                     placeholder='Please input the new question'
                 />
-                <Text>New Answer:</Text>
+                <Text style={styles.label}>New Answer:</Text>
                 <TextInput 
                     multiline
                     numberOfLines={4}
+                    style={universal.input}
                     onChangeText={this.onChangeAnswer}
                     placeholder='Please input the new answer'
                 />
-                <TouchableOpacity disabled={question === '' || answer === ''} onPress={this.onSubmit}>
-                    <Text>Submit</Text>
+                <TouchableOpacity 
+                    disabled={question === '' || answer === ''} 
+                    onPress={async () => {await this.onSubmit() .then(() => navigation.navigate('Deck', {title: route.params.title}))}}
+                    style={universal.button}
+                    >
+                    <Text style={universal.buttonText}>Submit</Text>
                 </TouchableOpacity>
             </View>
         )
     }
 }
 
-function mapStateToProps (decks, {route} ) {
-    const { title } = route.params
-    return {
-        decks,
-        title
-    }
-}
 
 function mapDispatchToProps () {
     return {
@@ -86,4 +86,13 @@ function mapDispatchToProps () {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(AddCard)
+const styles = StyleSheet.create({
+    'label': {
+        marginTop: 10,
+        fontSize: 20,
+        color: 'midnightblue',
+        fontWeight: 'bold',
+    }
+})
+
+export default connect(mapDispatchToProps)(AddCard)

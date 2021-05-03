@@ -11,6 +11,7 @@ import {
 } from 'react-native'
 import { CommonActions } from '@react-navigation/native'
 import { connect } from 'react-redux'
+import universal from './Styles'
 
 class AddDeck extends Component {
     state = {
@@ -46,18 +47,20 @@ class AddDeck extends Component {
     render() {
         const { title } = this.state
         return (
-            <View>
-                <Text>What is the title of your new quiz?</Text>
+            <View style={universal.container}>
+                <Text style={{fontSize: 20, color: 'midnightblue', fontWeight: 'bold'}}>What is the title of your new quiz?</Text>
                 <TextInput
+                    style={universal.input}
                     onChangeText={this.onChange}
                     placeholder='Please enter your new title'
                 />
-                <TouchableOpacity disabled={title===''} onPress={this.handleSubmit}>
-                    <Text>Submit</Text>
+                <TouchableOpacity
+                    style={universal.button} 
+                    disabled={title===''} onPress={this.handleSubmit}
+                    >
+                    <Text style={universal.buttonText}>Submit</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={this.toHome}>
-                    <Text>Back to Main</Text>
-                </TouchableOpacity>
+                
             </View>
         )
     }
