@@ -7,7 +7,7 @@ import { createStore } from 'redux'
 import { Provider } from 'react-redux'
 import decks from './reducers/decks'
 import DeckList from './components/DeckList';
-import CardContainer from './components/CardContainer';
+import QuizView from './components/QuizView';
 import Deck from './components/Deck'
 import Score from './components/Score'
 import AddCard from './components/AddCard'
@@ -23,9 +23,9 @@ const StackNavigatorConfigs = {
 const MainNav = () => (
   <Stack.Navigator>
     <Stack.Screen name='DeckList' component={DeckList}/>
-    <Stack.Screen name='AddDeck' component={AddDeck} />  
+    <Stack.Screen name='AddDeck' component={AddDeck} />
+    <Stack.Screen name='QuizView' component={QuizView}/>    
     <Stack.Screen name='Deck' component={Deck}/>
-    <Stack.Screen name='CardContainer' component={CardContainer}/>  
     <Stack.Screen name='Score' component={Score} />    
     <Stack.Screen name='AddCard' component={AddCard} />
   </Stack.Navigator>
