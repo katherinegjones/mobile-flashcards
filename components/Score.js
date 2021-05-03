@@ -1,19 +1,38 @@
 import React, { Component } from 'react'
 import { View, Text, TouchableOpacity, Platform, StyleSheet } from 'react-native'
 import { connect } from 'react-redux'
-import { shuffleDeck } from '../utils/helpers'
+import universal from './Styles'
+import { getShuffledDeck } from '../utils/api'
+import { receiveDecks } from '../actions/decks'
+import { FontAwesome5, Entypo } from '@expo/vector-icons'
 
 class Score extends Component {
+    reShuffle = async () => {
+        const { deckTitle, dispatch } = this.props
+        getShuffledDeck(deckTitle) 
+        .then((results) => {
+            dispatch(receiveDecks(results))
+        })
+    }
     render() {
+        const { deckTitle, numCorrect, total, navigation } = this.props
         return (
-            <View>
+            <View style={universal.container}>
                 <Text>Your Score:</Text>
-                <Text>{this.props.numCorrect}/{this.props.total}</Text>
-                <TouchableOpacity onPress={() => this.props.navigation.navigate('Decks')}>
-                    <Text>Back to Main</Text>
+                <Text>{numCorrect}/{total}</Text>
+                <TouchableOpacity 
+                    onPress={() => {navigation.navigate('DeckList')}}
+                    style={universal.button}
+                    >
+                        <Entypo name='arrow-bold-left' color='linen' size={15}/>
+                    <Text style={[universal.buttonText, {marginLeft: 5}]}>Back to Main</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => this.props.navigation.navigate('CardContainer', {title: deckTitle})}>
-                    <Text>Replay</Text>
+                <TouchableOpacity 
+                    onPress={async () => {this.reShuffle() .then(() => navigation.navigate('QuizView', {title: deckTitle}))}}
+                    style={universal.button}
+                    >
+                    <Text style={[universal.buttonText, {marginRight: 5}]}>Replay</Text>
+                    <FontAwesome5 name='redo-alt' color='linen'/>
                 </TouchableOpacity>
             </View>
         )
@@ -23,8 +42,10 @@ class Score extends Component {
 
 function mapStateToProps(state, { route }) {
     const { numCorrect, deckTitle } = route.params
-    const total = state[deckTitle].questions.length
+    const deck = state[deckTitle]
+    const total = deck.questions.length
     return {
+        deck,
         deckTitle, 
         numCorrect,
         total

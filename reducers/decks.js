@@ -1,4 +1,4 @@
-import { RECEIVE_DECKS, ADD_DECK, RECEIVE_DECK, ADD_CARD } from '../actions/decks'
+import { RECEIVE_DECKS, ADD_DECK, RECEIVE_SHUFFLED, ADD_CARD, REMOVE_DECK } from '../actions/decks'
 
 export default function decks (state = {}, action) {
     switch (action.type) {
@@ -7,16 +7,20 @@ export default function decks (state = {}, action) {
                 ...state,
                 ...action.decks
             }
+            
         case ADD_DECK: 
             return {
                 ...state,
                 ...action.info
             }
-        case RECEIVE_DECK:
+
+        case REMOVE_DECK:
+            let copy = {...state}
+            delete copy[action.title]
             return {
-                ...state,
-                ...action.cards
+                copy
             }
+
         case ADD_CARD:
             const obj = {
                 question: action.question,

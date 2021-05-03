@@ -23,7 +23,7 @@ export function getShuffledDeck(title){
             }
         }
 
-        return data[title].questions
+        AsyncStorage.setItem(DECK_STORAGE_KEY, JSON.stringify(newData))
     })
 }
 
@@ -41,7 +41,16 @@ export function saveDeckTitle(title) {
     )  
     }
 
-    
+export function removeDeckFromStore(title) {
+    return AsyncStorage.getItem(DECK_STORAGE_KEY)
+    .then((results) => {
+        const data = JSON.parse(results)
+        data[title] = undefined
+        delete data[title]
+
+        AsyncStorage.setItem(DECK_STORAGE_KEY, JSON.stringify(data))
+    })
+}
 
 
 export function addCardToDeck( title, question, answer ){
