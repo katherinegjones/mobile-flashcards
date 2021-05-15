@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View, Platform } from 'react-native';
+import React, { Component } from 'react';
+import { View, Platform } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native'
 import { createStore } from 'redux'
@@ -12,6 +12,7 @@ import Deck from './components/Deck'
 import Score from './components/Score'
 import AddCard from './components/AddCard'
 import AddDeck from './components/AddDeck'
+import { setLocalNotification } from './utils/helpers';
 
 
 const Stack = createStackNavigator()
@@ -20,27 +21,75 @@ const StackNavigatorConfigs = {
   headerMode: 'screen'
 }
 
+const headerColors = {
+  headerTintColor: 'linen',
+  headerStyle: {
+    backgroundColor: 'midnightblue'
+  }
+}
 const MainNav = () => (
   <Stack.Navigator>
-    <Stack.Screen name='DeckList' component={DeckList}/>
-    <Stack.Screen name='AddDeck' component={AddDeck} />
-    <Stack.Screen name='QuizView' component={QuizView}/>    
-    <Stack.Screen name='Deck' component={Deck}/>
-    <Stack.Screen name='Score' component={Score} />    
-    <Stack.Screen name='AddCard' component={AddCard} />
+    <Stack.Screen 
+      name='DeckList' 
+      component={DeckList}
+      options={{
+        ...headerColors,
+        title: 'Deck List'
+      }}/>
+    <Stack.Screen 
+      name='AddDeck' 
+      component={AddDeck} 
+      options={{
+        ...headerColors,
+        title: 'Add a New Deck'
+      }}
+      />
+    <Stack.Screen 
+      name='QuizView' 
+      component={QuizView}
+      options = {{
+        ...headerColors,
+        title: 'Quiz',
+        headerLeft: () => null
+      }}
+      />    
+    <Stack.Screen 
+      name='Deck' 
+      component={Deck}
+      options={headerColors}
+      />
+    <Stack.Screen 
+      name='Score' 
+      component={Score} 
+      options={headerColors}
+      />    
+    <Stack.Screen 
+      name='AddCard' 
+      component={AddCard} 
+      options={{
+        ...headerColors,
+        title: 'Add a New Card'
+      }}
+      />
   </Stack.Navigator>
 )
 
-export default function App() {
-  return (
-    <Provider store={createStore(decks)}>
-      <View style={{flex: 1}}>
-        <NavigationContainer>
-          <MainNav />
-        </NavigationContainer>
-      </View>
-    </Provider>
-  );
+class App extends Component {
+  componentDidMount() {
+    setLocalNotification()
+  }
+  
+  render(){
+    return (
+      <Provider store={createStore(decks)}>
+        <View style={{flex: 1}}>
+          <NavigationContainer>
+            <MainNav />
+          </NavigationContainer>
+        </View>
+      </Provider>
+    );
+  }
 }
-
+ export default App
 
