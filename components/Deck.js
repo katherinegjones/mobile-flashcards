@@ -4,29 +4,32 @@ import {
     View,
     Text,
     TouchableOpacity,
+    Alert,
     Platform,
     StyleSheet
 } from 'react-native'
 import { connect } from 'react-redux'
-import universal from './Styles'
+import shared from './Styles'
 import { getShuffledDeck, removeDeckFromStore } from '../utils/api'
 import { receiveDecks, removeDeck } from '../actions/decks'
 import { Entypo, FontAwesome } from '@expo/vector-icons'
 
 class Deck extends Component {
     shuffleThenStart = async () => {
-        const { title, dispatch } = this.props
-        getShuffledDeck(title) 
+        const { title, receiveDecks, navigation } = this.props
+        await getShuffledDeck(title) 
         .then((results) => {
-            dispatch(receiveDecks(results))
+            receiveDecks(results)
+           
         })
+        .then(() =>  navigation.navigate('QuizView', {deckTitle: title}))        
     }
 
     remove = async () => {
-        const { dispatch, title, navigation } = this.props
+        const { removeDeck, title, navigation } = this.props
         
         await removeDeckFromStore(title)
-        dispatch(await removeDeck(title))
+        await removeDeck(title)
         
         navigation.navigate('DeckList') 
     }
@@ -39,32 +42,32 @@ class Deck extends Component {
         const { deck, title, navigation } = this.props
         const questions = deck.questions
         return(
-            <View style={universal.container}>
+            <View style={shared.container}>
                 <Text style={styles.deckTitle}>{title}</Text>
-                <Text style={{fontSize: 20, color: 'midnightblue', marginBottom: 10}}># of cards: {questions.length}</Text>
+                <Text style={{fontSize: 20, color: 'midnightblue', marginBottom: 30}}># of cards: {questions.length}</Text>
                 {questions.length > 0 && (
                 <TouchableOpacity 
-                    onPress={async () => { await this.shuffleThenStart() .then(() => navigation.navigate('QuizView', {deckTitle: title}))}}
-                    style={universal.button}
+                    onPress= {this.shuffleThenStart}
+                    style={styles.startButton}
                     >
-                    <Text style={[universal.buttonText, {paddingRight: 5}]}>Start Quiz</Text>
-                    <FontAwesome name='play-circle' color='linen' size={15}/>                    
+                    <Text style={{fontWeight: 'bold', fontSize: 20, color: 'midnightblue', paddingRight: 5}}>Start Quiz</Text>
+                    <FontAwesome name='play-circle' color='midnightblue' size={20}/>                    
                 </TouchableOpacity>
                 )}
                 
                 <TouchableOpacity 
                     onPress={() => navigation.navigate('AddCard', {title: title})}
-                    style={universal.button}
+                    style={shared.button}
                     >
                     <Entypo name='circle-with-plus' color='linen'/>
-                    <Text style={[universal.buttonText, {marginLeft: 4}]}>Add Card</Text>
+                    <Text style={[shared.buttonText, {marginLeft: 4}]}>Add Card</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     onPress={this.remove}
-                    style={universal.button}
+                    style={shared.button}
                 >
                     <Entypo name='circle-with-minus' color='linen'/>
-                    <Text style={[universal.buttonText, {marginLeft: 4}]}>Remove Deck</Text>
+                    <Text style={[shared.buttonText, {marginLeft: 4}]}>Remove Deck</Text>
                 </TouchableOpacity>
             </View>
         )
@@ -79,18 +82,42 @@ function mapStateToProps( state, { route } ) {
     }
 }
 
+function mapDispatchToProps (dispatch) {
+    return {
+        receiveDecks: (decks) => dispatch(receiveDecks(decks)),
+        removeDeck: (title) => dispatch(removeDeck(title))
+    }
+}
+
 const styles = StyleSheet.create({
     
     'deckTitle': {
+        marginTop: 5,
+        fontWeight: 'bold',
         fontSize: 35,
         color: 'midnightblue',
-        fontWeight: 'bold',
         textShadowOffset: {width: 2, height: 2},
         textShadowColor: 'lightsteelblue',
         textShadowRadius: 4,
-        backgroundColor: 'linen',
+        marginBottom: 10,
+    },
+    'startButton': {
+        color: 'midnightblue',
+        fontSize: 20,
+        padding: 8,
         marginBottom: 20,
+        borderColor: 'midnightblue',
+        borderWidth: 1,
+        borderRadius: 5,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        backgroundColor: 'linen',
+        shadowColor: 'midnightblue',
+        shadowRadius: 2,
+        shadowOffset: {width: 2, height: 2},
+        shadowOpacity: 0.5
     }
 })
 
-export default connect(mapStateToProps)(Deck)
+export default connect(mapStateToProps, mapDispatchToProps)(Deck)
