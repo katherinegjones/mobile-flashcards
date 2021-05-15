@@ -7,7 +7,6 @@ const DECK_STORAGE_KEY = 'MobileFlashcards:deck'
 export function getDecks() {
     //AsyncStorage.clear()
     return AsyncStorage.getItem(DECK_STORAGE_KEY)
-    //.then((results) => console.log("Received results: ", JSON.parse(results)))
 }
 
 export function getShuffledDeck(title){
@@ -15,6 +14,8 @@ export function getShuffledDeck(title){
     .then((results) => {
         const data = JSON.parse(results)
         const deck = data[title].questions
+        data[title] = undefined
+        delete data[title]
         const shuffled = shuffleDeck(deck)
         const newData = {
             ...data,
@@ -22,16 +23,22 @@ export function getShuffledDeck(title){
                 questions: shuffled
             }
         }
-
-        AsyncStorage.setItem(DECK_STORAGE_KEY, JSON.stringify(newData))
+        AsyncStorage.mergeItem(DECK_STORAGE_KEY, JSON.stringify({
+            [title]: {
+                questions: shuffled
+            }
+        }))
     })
+}
+
+export function getDeck(title) {
+
 }
 
 export function saveDeckTitle(title) {
     return AsyncStorage.getItem(DECK_STORAGE_KEY)
     .then((results) => {
         const data = JSON.parse(results)
-        //console.log(data)
             AsyncStorage.mergeItem(DECK_STORAGE_KEY, JSON.stringify({
                 [title]: {
                     questions: []
@@ -48,7 +55,12 @@ export function removeDeckFromStore(title) {
         data[title] = undefined
         delete data[title]
 
-        AsyncStorage.setItem(DECK_STORAGE_KEY, JSON.stringify(data))
+        if (Object.keys(data).length === 0) {
+            AsyncStorage.removeItem(DECK_STORAGE_KEY)
+        }
+        else {
+            AsyncStorage.setItem(DECK_STORAGE_KEY, JSON.stringify(data))
+        }
     })
 }
 
@@ -67,8 +79,6 @@ export function addCardToDeck( title, question, answer ){
                 questions: data[title].questions ? data[title].questions.concat(obj) : obj
             }
         }
-        
-        console.log(newData)
         AsyncStorage.setItem(DECK_STORAGE_KEY, JSON.stringify(newData))
     })
 }
