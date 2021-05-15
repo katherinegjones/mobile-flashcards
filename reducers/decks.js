@@ -15,21 +15,18 @@ export default function decks (state = {}, action) {
             }
 
         case REMOVE_DECK:
-            let copy = {...state}
-            delete copy[action.title]
+            delete state[action.title] 
             return {
-                copy
+                ...state
             }
 
         case ADD_CARD:
-            const obj = {
-                question: action.question,
-                answer: action.answer
-            }
+            const {title, question, answer } = action.info
+            const card = { question, answer }
             return {
                ...state,
-               [action.title] : {
-                   questions: state[action.title].questions.concat(obj)
+               [title] : {
+                   questions: (state[title].questions || []).concat(card)
                }
             }
             

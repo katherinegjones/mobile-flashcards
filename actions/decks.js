@@ -10,7 +10,6 @@ export function receiveDecks(decks){
     }
 }
 export function addDeck(info) {
-    //console.log(info)
     return {
         type: ADD_DECK,
         info
