@@ -8,10 +8,10 @@ import {
     Platform,
     StyleSheet
 } from 'react-native'
-import { CommonActions } from '@react-navigation/native'
 import { connect } from 'react-redux'
-import { addCard } from '../actions/decks'
-import universal from './Styles'
+import { addCard, updateStore } from '../actions/decks'
+import shared from './Styles'
+import { add } from 'react-native-reanimated'
 
 class AddCard extends Component {
     state = {
@@ -20,7 +20,6 @@ class AddCard extends Component {
     }
 
     onChangeQuestion = (text) => {
-        console.log(text)
         this.setState(() => ({
             question: text
         }))
@@ -33,29 +32,32 @@ class AddCard extends Component {
     }
     onSubmit = async () => {
         const { question, answer } = this.state
-        const { route, navigation, addCard } = this.props
-        const { title } = route.params
-        addCard({ question, answer })
+        const { route, addCard, title } = this.props
+        await addCard({ title, question, answer })
         await addCardToDeck(title, question, answer)
-        this.setState(() => ({
+        .then(() => {
+            this.setState(() => ({
                 question: '',
                 answer: ''
-            }))     
+            }))
+            
+        })
+             
         
     }
 
-   
+  
 
     render() {
         const { question, answer } = this.state
         const { navigation, route } = this.props
         return (
-            <View style={universal.container}>
+            <View style={shared.container}>
                 <Text style={styles.label}>New Question:</Text>
                 <TextInput
                     multiline
                     numberOfLines={4}
-                    style={universal.input}
+                    style={shared.input}
                     onChangeText={this.onChangeQuestion}
                     placeholder='Please input the new question'
                 />
@@ -63,26 +65,33 @@ class AddCard extends Component {
                 <TextInput 
                     multiline
                     numberOfLines={4}
-                    style={universal.input}
+                    style={shared.input}
                     onChangeText={this.onChangeAnswer}
                     placeholder='Please input the new answer'
                 />
                 <TouchableOpacity 
                     disabled={question === '' || answer === ''} 
                     onPress={async () => {await this.onSubmit() .then(() => navigation.navigate('Deck', {title: route.params.title}))}}
-                    style={universal.button}
+                    style={shared.button}
                     >
-                    <Text style={universal.buttonText}>Submit</Text>
+                    <Text style={shared.buttonText}>Submit</Text>
                 </TouchableOpacity>
             </View>
         )
     }
 }
 
+function mapStateToProps(state, { route }) {
+    const { title } = route.params
 
-function mapDispatchToProps () {
     return {
-        addCard
+        title
+    }
+}
+
+function mapDispatchToProps (dispatch) {
+    return {
+        addCard: (card) => dispatch(addCard(card))
     }
 }
 
@@ -95,4 +104,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default connect(mapDispatchToProps)(AddCard)
+export default connect(mapStateToProps, mapDispatchToProps)(AddCard)
