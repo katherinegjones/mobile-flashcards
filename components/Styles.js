@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native'
 
-const universal = StyleSheet.create({
+const shared = StyleSheet.create({
     'container': {
         flex: 1,
         flexDirection: 'column',
@@ -17,6 +17,7 @@ const universal = StyleSheet.create({
         borderRadius: 5
     },
     'buttonText': {
+        fontSize: 15,
         color: 'linen',
         fontWeight: 'bold',
     },
@@ -24,10 +25,10 @@ const universal = StyleSheet.create({
         borderRadius: 2,
         borderWidth: 1,
         borderColor: 'midnightblue',
-        backgroundColor: 'linen',
+        backgroundColor: 'lightsteelblue',
         margin: 5,
         padding: 5
     } 
 })
 
-export default universal
+export default shared

@@ -11,7 +11,7 @@ import {
 } from 'react-native'
 import { CommonActions } from '@react-navigation/native'
 import { connect } from 'react-redux'
-import universal from './Styles'
+import shared from './Styles'
 
 class AddDeck extends Component {
     state = {
@@ -47,18 +47,18 @@ class AddDeck extends Component {
     render() {
         const { title } = this.state
         return (
-            <View style={universal.container}>
+            <View style={shared.container}>
                 <Text style={{fontSize: 20, color: 'midnightblue', fontWeight: 'bold'}}>What is the title of your new quiz?</Text>
                 <TextInput
-                    style={universal.input}
+                    style={shared.input}
                     onChangeText={this.onChange}
                     placeholder='Please enter your new title'
                 />
                 <TouchableOpacity
-                    style={universal.button} 
+                    style={shared.button} 
                     disabled={title===''} onPress={this.handleSubmit}
                     >
-                    <Text style={universal.buttonText}>Submit</Text>
+                    <Text style={shared.buttonText}>Submit</Text>
                 </TouchableOpacity>
                 
             </View>
